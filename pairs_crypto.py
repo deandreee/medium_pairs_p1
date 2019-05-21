@@ -15,6 +15,22 @@ import matplotlib.pyplot as plt
 
 plt.rcParams["figure.figsize"] = [16, 8]
 
+
+class CommInfo_Crypto(bt.CommInfoBase):
+    params = (
+        ('stocklike', True),
+        ('commtype', bt.CommInfoBase.COMM_PERC),
+        ('percabs', True),
+    )
+
+    def getsize(self, price, cash):
+        return self.p.leverage * (cash / price)
+
+    # def getcommission(self, size, price):
+    #     comm = super().getcommission(size, price)
+    #     print("comm", comm)
+    #     return comm
+
 # spread = a/b let's see what happens ...
 
 
@@ -140,8 +156,8 @@ def runstrategy():
     compression = args.compression
     spread_period = args.spread_period
     period = get_period(compression, spread_period)
-    start = args.fromdate or "2018-07-01"
-    end = args.todate or "2018-09-01"
+    start = args.fromdate or "2019-01-01"
+    end = args.todate or "2019-04-01"
 
     coin0 = args.c0 or "BTC"
     data_raw = fetch_data_db(coin0, start=start, end=end)
@@ -178,7 +194,8 @@ def runstrategy():
     cerebro.broker.setcash(start_value)
 
     commission = float(args.commission or 0.001)
-    cerebro.broker.setcommission(commission=commission)
+    comminfo = CommInfo_Crypto(commission=commission)
+    cerebro.broker.addcommissioninfo(comminfo)
 
     cerebro.addanalyzer(btanalyzers.SharpeRatio, _name="sharpe")
 

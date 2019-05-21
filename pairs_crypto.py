@@ -31,10 +31,11 @@ class CommInfo_Crypto(bt.CommInfoBase):
     #     print("comm", comm)
     #     return comm
 
-# spread = a/b let's see what happens ...
+# used in place of OLS_TransformationN
+# spread = a/b
 
 
-class OLS_TransformationN_3(PeriodN):
+class SpreadZScore(PeriodN):
     _mindatas = 2  # ensure at least 2 data feeds are passed
     lines = ("zscore",)
     params = (("period", 10),)
@@ -93,7 +94,7 @@ class CryptoPairsStrat(bt.Strategy):
         if self.p.ols == 2:
             self.transform = btind.OLS_TransformationN_2(period=self.p.period)
         elif self.p.ols == 3:
-            self.transform = OLS_TransformationN_3(period=self.p.period)
+            self.transform = SpreadZScore(period=self.p.period)
         else:
             raise Exception("Unknown OLS type: " + self.p.ols)
 
